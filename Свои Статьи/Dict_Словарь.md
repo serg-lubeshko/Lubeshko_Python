@@ -108,8 +108,7 @@ IT- итерируемый объект
 
 ##### Генератор словарей
 
-**Генератор словарей** – это выражение и цикл с необязательным условием, заключенное в фигурные скобки, очень напоминающее генератор множеств. Подобно генераторам списков и множеств, генераторы
-словарей поддерживают две формы записи:
+**Генератор словарей** – это выражение и цикл с необязательным условием, заключенное в фигурные скобки, очень напоминающее генератор множеств. Подобно генераторам списков и множеств, генераторы словарей поддерживают две формы записи:
 
 ```python
 {keyexpression: valueexpression for key, value in iterable}
@@ -143,5 +142,66 @@ words[word] = words.get(word, 0) + 1
 """Когда слово встречается впервые (когда необходимо создать новый элемент со значением счетчика, равным 1), а также случаи, когда слово встречается повторно (когда необходимо прибавить 1 к значению счетчика для уже существующего слова)."""
 ```
 
-При создании словаря со значениями по умолчанию мы можем определять фабричную функцию. **Фабричная функция** – это функция, которая вызывается, чтобы получить объект определенного типа.
+При создании словаря со значениями по умолчанию мы можем определять фабричную функцию. **Фабричная функция** – это функция, которая вызывается, чтобы получить объект определенного типа. Фабричная функция, передаваемая словарю со значениями по умолчанию, используется для создания значений по умолчанию для отсутствующих ключей.  Внимание,  имя функции – это ссылка на объект функции, поэтому, когда функция передается в качестве аргумента, передается одно только имя функции. Когда вслед за именем функции записываются круглые скобки, они сообщают интерпретатору, что он должен вызвать эту функцию.  
+
+[Defaultdict in Python](https://www.geeksforgeeks.org/defaultdict-in-python/) `defaultdict` позволяет вызывающему объекту указать значение по умолчанию (возвращаемое значение) заранее при инициализации контейнера."
+
+```python
+from collections import defaultdict
+# Defining a dict
+d = defaultdict(list) #Фабричная функция
+for i in range(5):
+    d[i].append(i)     
+print("Dictionary with values as list:")
+print(d)
+```
+
+Пример 2
+
+```python
+from collections import defaultdict
+  
+# Function to return a default
+# values for keys that is not
+# present
+def def_value():
+    return "Not Present"
+      
+# Defining the dict
+d = defaultdict(def_value)
+d["a"] = 1
+d["b"] = 2
+  
+print(d["a"])    
+print(d["b"])
+print(d["c"])
+>>>1
+>>>2
+>>>Not Present
+```
+
+[Python Dictionary | setdefault()](https://www.geeksforgeeks.org/python-dictionary-setdefault-method/)
+
+```python
+dict.setdefault(key, default = None)
+```
+
+Метод `dict.setdefault()` Получит значение ключа, если его нет добавит в словарь с указанным значением по умолчанию. Автоматически добавляет элемент словаря, если он отсутствует.
+
+```python
+Dictionary1 = { 'A': 'Geeks', 'B': 'For'}
+ 
+# using setdefault() method
+# when key is not in the Dictionary
+Third_value = Dictionary1.setdefault('C')
+print("Dictionary:", Dictionary1)			>>> Dictionary: {'A': 'Geeks', 'B': 'For', 'C': None}
+print("Third_value:", Third_value)			>>> Third_value: None
+ 
+# using setdefault() method
+# when key is not in the Dictionary
+# but default value is provided
+Fourth_value = Dictionary1.setdefault('D', 'Geeks') 
+print("Dictionary:", Dictionary1)					>>> Dictionary: {'A': 'Geeks', 'B': 'For', 'C': None, 'D': 'Geeks'}
+print("Fourth_value:", Fourth_value)				>>> Fourth_value: Geeks
+```
 
