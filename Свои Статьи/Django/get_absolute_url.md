@@ -27,7 +27,7 @@
   	return ”/bboard/%s/" % self.pk #такой подход не самый лучший для создания подобных методов. Лучше использовать функцию reverse()
   
   exampl 2:
-      """path('detail/<int:room_id>/', DetailRooms, name="detail) -  строим маршрут. Строка из urls.py"""")
+      """path('detail/<int:room_id>/', DetailRooms, name="detail") -  строим маршрут. Строка из urls.py"""")
      ....
       def get_absolute_url(self):
           return reverse('detail', kwargs={"room_id":self.pk})
