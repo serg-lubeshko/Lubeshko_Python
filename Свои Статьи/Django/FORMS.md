@@ -7,3 +7,7 @@ https://djbook.ru/examples/57/
 Формы Django проверяют тип каждого поля класса (в модели нет), чтобы выяснить, имеет ли поле тип django.forms.fields.Field.
 
 continue....
+
+
+
+https://tproger.ru/translations/django-orm-tips/
