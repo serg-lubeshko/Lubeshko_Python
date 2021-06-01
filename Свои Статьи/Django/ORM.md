@@ -9,3 +9,18 @@
 |                                                              |                                                              |      |
 |                                                              |                                                              |      |
 
+```python
+class Bb(models.Model) :
+rubric = models.ForeignKey(Rubric, on_delete=models.PROTECT, related_name=’entries’)
+....
+
+#Связь через related_name. имя атрибута записи первичной модели, предназначенного для доступа к связанным записям вторичной модели, в виде строки:
+# Получаем первую рубрику
+first_rubric = Rubric.objects.first()
+# Получаем доступ к связанным объявлениям через атрибут entries,
+# указанный в параметре related_name
+bbs = first_rubric.entries.all()
+
+
+```
+
