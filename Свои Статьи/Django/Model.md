@@ -91,3 +91,15 @@ https://django.fun/docs/django/ru/3.1/ref/models/instances/#model-instance-refer
 |                                               |                                             |
 |                                               |                                             |
 
+### Своя функция
+
+```python
+ ... 
+facilities = models.ManyToManyField("Facilities")
+number_room = models.CharField(max_length=3, verbose_name='№ комнаты', blank=True)
+
+   def save(self, *args, **kwargs):
+       self.number_room = self.title[0:3]
+       super(Room, self).save()
+```
+
