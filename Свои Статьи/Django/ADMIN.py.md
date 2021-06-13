@@ -23,3 +23,23 @@ admin.site.register(Bb, BbAdmin)
 |                   |                                                              |
 |                   |                                                              |
 
+Делаем выпадающее меню в админке, где таблица БД == категории объекта
+
+```python
+from django.contrib import admin
+from .models import *
+from django import forms
+
+
+class NotebookCategoryChoiseField(forms.ModelChoiceField):
+    pass
+
+
+class NoteBookAdmin(admin.ModelAdmin):
+
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        if db_field.name == 'category':
+            return NotebookCategoryChoiseField(Category.objects.filter(slug='Noutbuki'))
+        return super().formfield_for_foreignkey(self, db_field, request, **kwargs)
+```
+

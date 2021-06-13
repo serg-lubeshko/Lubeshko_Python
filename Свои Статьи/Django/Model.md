@@ -82,14 +82,14 @@ https://django.fun/docs/django/ru/3.1/ref/models/instances/#model-instance-refer
 
 
 
-# Методы модели, которые переопределим:
+### Методы модели, которые переопределим:
 
-| Метод                                         | Описание                                    |
-| --------------------------------------------- | ------------------------------------------- |
-| def__ str (self) :<br/>      return self.name | Возвращающий строковое представление класса |
-|                                               |                                             |
-|                                               |                                             |
-|                                               |                                             |
+| Метод                                           | Описание                                    |
+| ----------------------------------------------- | ------------------------------------------- |
+| def__ str__ (self) :<br/>      return self.name | Возвращающий строковое представление класса |
+|                                                 |                                             |
+|                                                 |                                             |
+|                                                 |                                             |
 
 ### Своя функция
 
@@ -101,5 +101,57 @@ number_room = models.CharField(max_length=3, verbose_name='№ комнаты', 
    def save(self, *args, **kwargs):
        self.number_room = self.title[0:3]
        super(Room, self).save()
+```
+
+
+
+### USER при создании модели
+
+```python
+from django.contrib.auth import get_user_model
+User = get_user_model() #(говорим Джанго что мы хотим использовать юзера, который указан в settings.AUTH_USER_MODEL )
+
+```
+
+
+
+### Полиморфные связи  ContentType
+
+Полиморфная связь создается в классе вторичной модели. Для ее установления необходимо объявить там три сущности:
+
+* поле для хранения типа модели, связываемой с записью. Оно должно иметь тип ForeignKey (т. е. внешний ключ для связи "один-со-многими"), устанавливать СВЯЗЬ С моделью ContentType из модуля django. contrib. contenttypes .models (там хранится перечень всех моделей проекта) и выполнять каскадное удаление. Обычно такому полю дается имя `content type;`
+* поле для хранения значения ключа связываемой записи. Оно должно иметь целочисленный тип — обычно PositiveintegerFieid. Как правило, этому полю дается имя `object id;`
+* поле полиморфной Связи, реализуемое экземпляром класса GenericForeignKey из модуля django.contrib.contenttypes. fields. Вот формат вызова его конструктора:
+  `GenericForeignKey ([ct_field=’ content_type ’ ] [, ] [fk_field=’object_id' ][, ] [for_concrete_model=True] )`
+
+Конструктор принимает следующие параметры:
+  `ct_fieid`— указывает имя поля, хранящего тип связываемой модели, если   это имя отличается от content type;
+  `fk_fieid` — указывает имя поля, хранящего ключ связываемой записи, если   это имя отличается от object id;
+  `for_concrete_model`— следует дать значение False, если необходимо устанавливать связи, в том числе и с прокси-моделями (о них будет рассказано
+  позже).  
+
+```python
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.models import ContentType
+#Экземпляр ContentType представляет и хранит информацию о моделях, использующихся в вашем проекте, и новые экземпляры модели ContentType создаются автоматически при добавлении новых моделей в проект.
+class CartProduct(models.Model):
+    user = models.ForeignKey('Customer', verbose_name='Покупатель', on_delete=models.CASCADE)
+    cart = models.ForeignKey('Cart', verbose_name='Корзина', on_delete=models.CASCADE, related_name='related_products')
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+    object_id = models.PositiveIntegerField()
+    content_object = GenericForeignKey('content_type', 'object_id')
+    qty = models.PositiveIntegerField(default=1)
+    final_price = models.DecimalField(max_digits=9, decimal_places=2, verbose_name='Общая цена')
+
+# p = NotebookProduct.objects.get(pk=1)
+# cp = CartProduct.objects.create(content_object=p). content_type и object_id создадутся автоматически. object_id станет 1, content_type модель Nooteproduct
+    
+    def __str__(self):
+        return "Продукт: {} (для корзины)".format(self.content_object.title)
+
+    def save(self, *args, **kwargs):
+        self.final_price = self.qty * self.content_object.price
+        super().save(*args, **kwargs)
+
 ```
 
