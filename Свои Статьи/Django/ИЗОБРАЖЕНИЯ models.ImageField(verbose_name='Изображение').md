@@ -28,3 +28,73 @@ if settings.DEBUG:
 #MEDIA_URL -  константа, которую мы создали в settings.py
 ```
 
+##### В админке валидирует размер
+
+Код в админке валидирует размер изображения на уровне форм, задает цвет help_text
+
+```python
+from PIL import Image
+from django.contrib import admin
+from django.core.exceptions import ValidationError
+from django.forms import ModelChoiceField, ModelForm
+from django.utils.safestring import mark_safe
+from .models import *
+from django import forms
+
+class NotebookAdminForm(ModelForm):
+    MIN_RESOLUTION = (100, 100)
+    MAX_RESOLUTION = (800, 800)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['image'].help_text = mark_safe(
+            '<span style= "color:red">Загружайте изображения с минимальным разрешением {}x{}</span>'.format(
+                *self.MIN_RESOLUTION))
+
+    def clean_image(self):
+        images = self.cleaned_data['image']
+        im = Image.open(images)
+        width, height = im.size
+        min_width, min_height = self.MIN_RESOLUTION
+        max_width, max_height = self.MAX_RESOLUTION
+        if width < min_width or height < min_height:
+            raise ValidationError('Размер изображения должен быть больше 100х100')
+        if width > max_width or height > max_height:
+            raise ValidationError('Размер изображения должен быть меньше 800х800')
+```
+
+##### Валидируем изображение в модели
+
+Валидируем изображение в модели. ValidationError там не работает, он для форм, пишем кастомный Exception и переопределяем метод save
+
+```python
+class MinResolutionImages(Exception):
+    pass
+
+
+class MaxResolutionImages(Exception):
+    pass
+
+class Product(models.Model):
+    MIN_RESOLUTION = (100, 100)
+    MAX_RESOLUTION = (800, 800)
+    .....
+
+	def __save__(self):
+        images = self.cleaned_data['image']
+        im = Image.open(images)
+        width, height = im.size
+        min_width, min_height = self.MIN_RESOLUTION
+        max_width, max_height = self.MAX_RESOLUTION
+        if width < min_width or height < min_height:
+            raise MinResolutionImages('Размер изображения должен быть больше 100х100')
+        if width > max_width or height > max_height:
+            raise MaxResolutionImages('Размер изображения должен быть меньше 800х800')
+```
+
+##### Обрежем изображение в модели:
+
+```python
+
+```
+
