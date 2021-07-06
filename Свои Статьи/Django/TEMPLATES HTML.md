@@ -23,3 +23,100 @@
 |                                    |                                                              |
 |                                    |                                                              |
 
+```python
+#Интересный ход решения
+{% if hour > 6 and hour < 13 %}
+  <p>Доброе утро! Мы {% if is_opened %}открыты {% else %}пока закрыты{% endif %}!</p>
+{% elif hour > 12 and hour < 18 %}
+  <p>Добрый день! Мы {% if is_opened %}открыты {% else %}пока закрыты{% endif %}!</p>
+{% elif hour > 17 and hour < 23 %}
+  <p>Добрый вечер! Мы {% if is_opened %}открыты {% else %}пока закрыты{% endif %}!</p>
+{% else %}
+  <p>Доброй ночи! Мы {% if is_opened %}открыты {% else %}пока закрыты{% endif %}!</p>
+{% endif %}
+```
+
+### Текущий пункт меню
+
+Частая задача — отметить, на какой странице находится пользователь – например, выделить цветом, рамкой или жирностью.
+
+В верстке для этого обычно используется `class="active"`.
+
+Осталось только написать логику, когда его выводить.
+
+Сначала проверим **settings.py** на предмет конфигурации шаблонизатора:
+
+```python
+TEMPLATES = [
+    {...
+'django.template.context_processors.request',       # нужна эта строчка
+      ...          
+            ],
+        },
+    },
+]
+```
+
+```html
+{% for link in links %}
+   <li>
+      <a href="..." class="{% if request.path == link.link %}active{% endif %}">
+			...
+      </a>
+  </li>
+{% endfor %}
+```
+
+```python
+Пример:
+#links = [{"title":"Мои приключения","link":"/adventures"},{"title":"Мои фотографии","link":"/photos"},{"title":"Реклама у меня","link":"/promo"},{"title":"Контакты","link":"/contacts"},]    
+<nav>
+    <ul>
+    {% for  link in links %}
+      <li><a href="{{ link.link }}/" {% if request.path == link.link %}class="active"{% endif %}>{{ link.title }}</a></li>        
+    {% endfor %}
+    </ul>
+</nav>
+```
+
+Обычное меню – просто набор ссылок, упакованных в <nav>:
+
+```html
+{% for link in links %}
+   <li> <a href="{{ link.link }}">{{link.title}}</a> </li>
+{% endfor %}
+```
+
+В Django переменная запроса доступна в шаблонах, используйте **request.path**, чтобы выделить текущую ссылку активной!
+
+```html
+{% for link in links %}
+   <li>
+      <a href="..." class="{% if request.path == link.link %}active{% endif %}">
+			...
+      </a>
+  </li>
+{% endfor %}
+```
+
+Чтобы вывести работающие ссылки на разделы, добавляем слеши к id в адресе:
+
+```html
+{% for cat in categories %}
+   <li>
+      <a href="/{{ cat.id }}/">{{ cat.title }}</a>
+  </li>
+{% endfor %}
+```
+
+Чтобы вывести ссылки на внутренние страницы используйте:
+
+```html
+<nav>
+{% for country in сountries %}
+    <a href="/{{ country.continent }}/{{ country.id }}/">{{ country.title }}</a>
+{% endfor %}
+</nav>
+```
+
+Вот и все! Теперь вы знаете, как делать меню и списки ссылок!
